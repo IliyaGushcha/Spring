@@ -51,46 +51,56 @@ public class ProjectController {
         return "Admin Board.";
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/company/{id}")
     public Company showCompany(@PathVariable(value = "id") long companyId) {
 
         return companyService.findCompanyById(companyId);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DeleteMapping("/company/{id}/delete")
     public void deleteCompany(@PathVariable(value = "id") long companyId) {
         companyService.deleteCompany(companyId);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping(value = "company/add/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void addCompany(@PathVariable("id") long id, @ModelAttribute CompanyRequest companyRequest) throws IOException {
         userService.addCompany(id, companyRequest);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("company/{id}/news/add")
     public void addNews(@PathVariable("id") long id, @RequestBody NewsDto news) {
         companyService.addNewsToCompany(id, news);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("company/comment/add")
     public void addComment(@RequestBody CommentDto commentDto) {
         commentService.addComment(commentDto.getUserId(), commentDto.getCompanyId(), commentDto.getText());
     }
 
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("company/{id}/comments/show")
     public List<ShowComment> showComments(@PathVariable long id) {
         return commentService.getComments(id);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("company/{id}/bonus/add")
     public void addBonus(@PathVariable long id, @RequestBody BonusDto bonus) {
         bonusService.addBonus(bonus, id);
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @PostMapping("company/support")
     public void support(@RequestBody SupportDto supportDto) {
         companyService.support(supportDto.getCompanyId(), supportDto.getBonusId());
         userService.addBonus(supportDto.getUserId(), supportDto.getBonusId());
     }
+
+
 }

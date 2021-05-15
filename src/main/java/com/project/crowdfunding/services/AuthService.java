@@ -87,8 +87,6 @@ public class AuthService {
         roleRepository.save(role);
         user.setRole(role);
         userRepository.save(user);
-        Company company = new Company(user.getUsername() + " company", user);
-        companyRepository.save(company);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 }
