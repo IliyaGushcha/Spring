@@ -2,6 +2,7 @@ package com.project.crowdfunding.controllers;
 
 import com.project.crowdfunding.dto.*;
 import com.project.crowdfunding.models.Company;
+import com.project.crowdfunding.models.ERole;
 import com.project.crowdfunding.models.User;
 import com.project.crowdfunding.services.BonusService;
 import com.project.crowdfunding.services.CommentService;
@@ -15,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.List;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 3600)
 @RestController
 @RequestMapping("/api/test")
 public class ProjectController {
@@ -33,7 +34,7 @@ public class ProjectController {
     BonusService bonusService;
 
     @GetMapping("/all")
-    public List<Company> authenticateUser() {
+    public List<Company> getAllCompanies() {
 
         return companyService.findAll();
     }
@@ -45,13 +46,6 @@ public class ProjectController {
     }
 
 
-    @GetMapping("/admin")
-    @PreAuthorize("hasRole('ADMIN')")
-    public String adminAccess() {
-        return "Admin Board.";
-    }
-
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/company/{id}")
     public Company showCompany(@PathVariable(value = "id") long companyId) {
 
@@ -65,7 +59,7 @@ public class ProjectController {
     }
 
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @PostMapping(value = "company/add/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "company/add/{id}")
     public void addCompany(@PathVariable("id") long id, @ModelAttribute CompanyRequest companyRequest) throws IOException {
         userService.addCompany(id, companyRequest);
     }
@@ -102,5 +96,23 @@ public class ProjectController {
         userService.addBonus(supportDto.getUserId(), supportDto.getBonusId());
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("users")
+    public List<UserDto> showUsers() {
+        return userService.getAllUsers();
+    }
 
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("user/{id}/role/change")
+    public void changeRole(@PathVariable long id, @RequestParam String role) {
+        ERole erole = ERole.valueOf(role);
+        System.out.println(erole);
+        userService.changeRole(id, role);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("user/{id}/delete")
+    public void deleteUser(@PathVariable long id) {
+        userService.deleteUser(id);
+    }
 }

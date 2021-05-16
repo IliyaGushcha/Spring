@@ -10,12 +10,9 @@ import java.util.*;
 
 public class CompanyRequest {
 
-    @Autowired
-    private Gson gson;
-
     private String name;
     private String description;
-    private BonusDto  bonus;
+    private BonusDto bonus;
     private String subject;
     private String video;
     private int amount;

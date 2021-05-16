@@ -1,14 +1,16 @@
 package com.project.crowdfunding.services;
 
-import com.project.crowdfunding.models.Bonus;
-import com.project.crowdfunding.models.Company;
-import com.project.crowdfunding.models.User;
+import com.project.crowdfunding.dto.UserDto;
+import com.project.crowdfunding.models.*;
 import com.project.crowdfunding.dto.CompanyRequest;
+import com.project.crowdfunding.rep.RoleRepository;
 import com.project.crowdfunding.rep.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserService {
@@ -28,8 +30,19 @@ public class UserService {
     @Autowired
     CommentService commentService;
 
+    @Autowired
+    RoleRepository roleRepository;
+
     public User userInfo(Long id) {
         return userRepository.findById(id).get();
+    }
+
+    public List<UserDto> getAllUsers() {
+        List <UserDto> userDtoList = new ArrayList<>();
+        for(User user : userRepository.findAll()) {
+            userDtoList.add(new UserDto(user.getId(), user.getUsername(), user.getRole().getName().name()));
+        }
+        return userDtoList;
     }
 
     public void addCompany(long id, CompanyRequest company) throws IOException {
@@ -51,5 +64,18 @@ public class UserService {
         Bonus bonus = bonusService.findBonusById(bonusId);
         bonus.setUser(user);
         bonusService.save(bonus);
+    }
+
+    public void changeRole(long userId, String role) {
+        User user = userRepository.findById(userId).get();
+        ERole eRole = ERole.valueOf(role);
+        Role newRole = new Role(eRole);
+        roleRepository.save(newRole);
+        user.setRole(newRole);
+        userRepository.save(user);
+    }
+
+    public void deleteUser(long id) {
+        userRepository.deleteById(id);
     }
 }
